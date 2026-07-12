@@ -76,14 +76,15 @@ def download(
     Downloads orderbook and trades data from CryptoHFTData using the official SDK.
 
     The CryptoHFTData SDK returns pandas DataFrames and downloads the vendor's hourly parquet chunks internally.
-    ``api_key`` is only required when ``client`` is not provided. If omitted, ``CRYPTOHFTDATA_API_KEY`` is used.
+    ``api_key`` is optional. If omitted, ``CRYPTOHFTDATA_API_KEY`` is used when set; otherwise the SDK uses the
+    rate-limited free tier.
 
     Args:
         symbol: Trading pair symbol, e.g. ``BTCUSDT``.
         exchange: CryptoHFTData exchange identifier, e.g. ``binance_futures``.
         start_date: Inclusive start date/datetime understood by the SDK.
         end_date: Inclusive end date/datetime understood by the SDK.
-        api_key: CryptoHFTData API key.
+        api_key: Optional CryptoHFTData API key. Keyless downloads use the rate-limited free tier.
         client: Optional injected SDK client for testing or custom configuration.
         max_workers: Maximum number of concurrent hourly file downloads used by the SDK.
 
@@ -204,7 +205,7 @@ def download_and_convert(
         exchange: CryptoHFTData exchange identifier, e.g. ``binance_futures``.
         start_date: Inclusive start date/datetime understood by the SDK.
         end_date: Inclusive end date/datetime understood by the SDK.
-        api_key: CryptoHFTData API key.
+        api_key: Optional CryptoHFTData API key. Keyless downloads use the rate-limited free tier.
         client: Optional injected SDK client for testing or custom configuration.
         max_workers: Maximum number of concurrent hourly file downloads used by the SDK.
         output_filename: If provided, the converted data will be saved to the specified filename in ``npz`` format.
@@ -242,9 +243,6 @@ def _get_client(api_key: str | None, client: Any) -> Any:
         )
 
     resolved_api_key = api_key or os.environ.get("CRYPTOHFTDATA_API_KEY")
-    if resolved_api_key is None:
-        raise ValueError("CryptoHFTData API key is required. Pass api_key or set CRYPTOHFTDATA_API_KEY.")
-
     return _CryptoHFTDataClient(api_key=resolved_api_key)
 
 

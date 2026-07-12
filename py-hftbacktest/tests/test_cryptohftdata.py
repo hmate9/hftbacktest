@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 import polars as pl
 
@@ -174,6 +175,38 @@ class TestCryptoHFTDataUtils(unittest.TestCase):
                 ),
             ],
         )
+
+    @patch.object(cryptohftdata, "_CryptoHFTDataClient")
+    @patch.dict("os.environ", {}, clear=True)
+    def test_download_creates_keyless_client_for_free_tier(self, client_factory):
+        client = client_factory.return_value
+        client.get_orderbook.return_value = self._update_orderbook_df()
+        client.get_trades.return_value = self._trade_df()
+
+        cryptohftdata.download(
+            symbol="BTCUSDT",
+            exchange="binance_futures",
+            start_date="2026-03-01",
+            end_date="2026-03-01",
+        )
+
+        client_factory.assert_called_once_with(api_key=None)
+
+    @patch.object(cryptohftdata, "_CryptoHFTDataClient")
+    @patch.dict("os.environ", {"CRYPTOHFTDATA_API_KEY": "environment-key"}, clear=True)
+    def test_download_uses_api_key_from_environment(self, client_factory):
+        client = client_factory.return_value
+        client.get_orderbook.return_value = self._update_orderbook_df()
+        client.get_trades.return_value = self._trade_df()
+
+        cryptohftdata.download(
+            symbol="BTCUSDT",
+            exchange="binance_futures",
+            start_date="2026-03-01",
+            end_date="2026-03-01",
+        )
+
+        client_factory.assert_called_once_with(api_key="environment-key")
 
     def test_download_and_convert_uses_injected_client(self):
         client = FakeCryptoHFTDataClient(self._update_orderbook_df(), self._trade_df())
