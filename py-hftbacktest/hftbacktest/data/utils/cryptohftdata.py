@@ -1,3 +1,5 @@
+"""Download and convert CryptoHFTData archives for HftBacktest replay."""
+
 from __future__ import annotations
 
 import os

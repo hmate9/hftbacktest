@@ -9,6 +9,7 @@ from hftbacktest.data.utils.cryptohftdata import download_and_convert
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line options for the CryptoHFTData conversion example."""
     parser = argparse.ArgumentParser(
         description="Download CryptoHFTData and convert it to HftBacktest's NPZ format.",
     )
@@ -27,6 +28,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Download, convert, and save the requested CryptoHFTData range."""
     args = parse_args()
     if args.output.suffix != ".npz":
         raise ValueError("output must use the .npz extension")

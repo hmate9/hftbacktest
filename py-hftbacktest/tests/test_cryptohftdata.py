@@ -1,3 +1,5 @@
+"""Tests for CryptoHFTData download and HftBacktest event conversion."""
+
 import unittest
 from unittest.mock import patch
 
@@ -21,6 +23,7 @@ def _strip_order_flags(ev):
 
 
 class FakeCryptoHFTDataClient:
+    """Provide deterministic SDK-shaped order book and trade frames."""
     def __init__(self, orderbook, trades):
         self._orderbook = orderbook
         self._trades = trades
@@ -36,6 +39,7 @@ class FakeCryptoHFTDataClient:
 
 
 class TestCryptoHFTDataUtils(unittest.TestCase):
+    """Verify CryptoHFTData schema normalization and event semantics."""
     def _update_orderbook_df(self, include_transaction_time=True):
         data = {
             "received_time": [1_000_000_000, 1_000_000_000],
